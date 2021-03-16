@@ -1,0 +1,7 @@
+tags
+.vscode
+.vs
+.DS_Store
+*.sw*
+
+build/

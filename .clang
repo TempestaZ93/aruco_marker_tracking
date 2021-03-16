@@ -1,0 +1,3 @@
+--include-directory=./include
+--include-directory=/usr/local/include/opencv4
+-extra-arg=-std=c++17
