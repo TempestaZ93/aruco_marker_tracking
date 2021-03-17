@@ -8,9 +8,11 @@ namespace amt {
 
 class DataAccess {
    public:
-    DataAccess(std::shared_ptr<ADataBackend> backend) {}
+    DataAccess(std::shared_ptr<ADataBackend> backend) : m_backend(backend) {}
 
    private:
+
+    std::shared_ptr<ADataBackend> m_backend;
 };
 
 }  // namespace amt
