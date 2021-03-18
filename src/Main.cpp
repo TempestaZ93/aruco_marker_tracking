@@ -7,22 +7,19 @@
 #include <sstream>
 
 #include "ArucoTracker.hpp"
+#include "CubeMarker.hpp"
 #include "data/CSVBackend.hpp"
 
-void callback(int id) { std::cout << id << " detected" << std::endl; }
-
 int handle_arguments(int argc, char* argv[], std::string& calibration_file,
-                     std::vector<int> marker_ids, float& marker_size,
-                     bool& save_marker_images);
+                     float& marker_size, bool& save_marker_images);
 
 int main(int argc, char* argv[]) {
     std::string calibration_file;
-    std::vector<int> marker_ids;
     float marker_size = 0.0f;
     bool save_marker_images = false;
 
-    int success = handle_arguments(argc, argv, calibration_file, marker_ids,
-                                   marker_size, save_marker_images);
+    int success = handle_arguments(argc, argv, calibration_file, marker_size,
+                                   save_marker_images);
     if (!success) {
         return 0;
     }
@@ -39,24 +36,25 @@ int main(int argc, char* argv[]) {
     std::shared_ptr<amt::CSVBackend> backend =
         std::make_shared<amt::CSVBackend>("testfile");
 
+    std::vector<std::shared_ptr<amt::AMarker>> markers = {
+        std::make_shared<amt::CubeMarker>(757, "Cube Marker 1", 1)};
+
     // create tracker
-    amt::ArucoTracker tracker(
-        marker_ids, {callback, callback, callback, callback, callback},
-        marker_size, calibration_file, backend);
+    amt::ArucoTracker tracker(markers, marker_size, calibration_file);
 
     if (save_marker_images) {
         // create marker images
-        std::vector<cv::Mat> markers;
-        tracker.get_markers(markers, 200);
+        std::vector<cv::Mat> marker_images;
+        tracker.get_markers(marker_images, 200);
 
         // save marker images
-        for (uint64_t marker = 0; marker < marker_ids.size(); marker++) {
+        for (uint64_t marker = 0; marker < markers.size(); marker++) {
             std::stringstream ss("");
 
-            ss << "./marker_" << marker_ids[marker] << ".png";
+            ss << "./marker_" << (markers[marker])->get_name() << ".png";
 
             std::cout << ss.str() << std::endl;
-            cv::imwrite(ss.str(), markers[marker]);
+            cv::imwrite(ss.str(), marker_images[marker]);
         }
     }
 
@@ -81,15 +79,12 @@ bool is_argument_valid(int argc, int arg, char* argv[],
 }
 
 int handle_arguments(int argc, char* argv[], std::string& calibration_file,
-                     std::vector<int> marker_ids, float& marker_size,
-                     bool& save_marker_images) {
+                     float& marker_size, bool& save_marker_images) {
     std::string help = R"(ArUco marker tracker
-   
+
 key | verbose key          <value>                                   (default)                 : description
 ------------------------------------------------------------------------------------------------------------
 -c  | --calibration_file   <path/to/opencv/calibration-file>         (./cameraCalibration.xml) : if present, you can link a opencv camera calibration file to improve performance
-
--m  | --marker_ids         <list of numbers representing marker ids> (1 2 3 4 5)               : list marker IDs to track 
 
 -s  | --marker_size        <decimal number in meters>                (0.03)                    : specify size of markers (all must be the same size)
 
@@ -100,24 +95,16 @@ key | verbose key          <value>                                   (default)  
 
     // init default values
     calibration_file = "./cameraCalibration.xml";
-    marker_ids = {1, 2, 3, 4, 5};
-    marker_size = 0.03f;
+    marker_size = 0.05f;
     save_marker_images = false;
 
     for (int arg = 1; arg < argc; arg++) {
         if (is_argument_valid(argc, arg, argv, "-c", "--calibration-file",
                               true)) {
             calibration_file = argv[++arg];
-        } else if (is_argument_valid(argc, arg, argv, "-m", "--marker-ids",
-                                     true)) {
-            marker_ids.clear();
-            int id = 0;
-            while ((id = std::atoi(argv[++arg])) != 0 && arg < argc - 1) {
-                marker_ids.push_back(id);
-            }
         } else if (is_argument_valid(argc, arg, argv, "-s", "--marker-size",
                                      true)) {
-            marker_size = std::atoi(argv[++arg]);
+            marker_size = std::atof(argv[++arg]);
         } else if (is_argument_valid(argc, arg, argv, "-i",
                                      "--save-marker-images", false)) {
             save_marker_images = true;

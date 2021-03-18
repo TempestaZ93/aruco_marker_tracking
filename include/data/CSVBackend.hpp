@@ -7,12 +7,12 @@ namespace amt {
 class CSVBackend : public ADataBackend {
    public:
     CSVBackend(std::string filename) : ADataBackend(filename) {}
-    ~CSVBackend() = default;
+    ~CSVBackend() override = default;
 
-    virtual std::string get_marker_info(int32_t id) override;
-    virtual std::vector<int32_t> get_data(int32_t id) override;
+    std::string get_marker_info(int32_t id) override;
+    std::vector<int32_t> get_data(int32_t id) override;
 
-    virtual int32_t connect() override;
+    int32_t connect() override;
 };
 
 }  // namespace amt
