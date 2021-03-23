@@ -12,6 +12,7 @@
 #include <functional>
 
 #include "AMarker.hpp"
+#include "Camera.hpp"
 #include "data/ADataBackend.hpp"
 #include "data/DataAccess.hpp"
 
@@ -28,13 +29,13 @@ class ArucoTracker {
                  float marker_size, std::string camera_calib_file);
 
     void add_marker(std::shared_ptr<AMarker> marker);
-    void remove_marker(int32_t id);
+    void remove_marker(std::string name);
     void update(cv::Mat image);
 
     void get_markers(std::vector<cv::Mat>& markers_out, int size);
 
    private:
-    auto marker_by_id(int32_t id);
+    std::vector<std::shared_ptr<AMarker>> markers_by_id(int32_t id);
 
    private:
     // all currently tracked marker ids for faster access
@@ -44,13 +45,14 @@ class ArucoTracker {
     // size of markers in meters
     float m_marker_size;
     // list of marker ids tracked last frame to track changes
-    std::vector<int> m_last_tracked_ids;
+    std::vector<int32_t> m_last_tracked_ids;
     // dictionary used by opencv to get markers information
     cv::Ptr<cv::aruco::Dictionary> m_dictionary;
     // aruco parameters for tracking line threshold and marker variance, border
     // deadzone and so on
     cv::Ptr<cv::aruco::DetectorParameters> m_parameters;
 
+    Camera m_camera;
     // Camera calibration variables
     cv::Mat m_camera_matrix;
     cv::Mat m_dist_coeffs;
