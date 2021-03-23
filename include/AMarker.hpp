@@ -1,6 +1,8 @@
 #include <opencv2/core.hpp>
 #include <string>
 
+#include "Camera.hpp"
+
 #pragma once
 
 namespace amt {
@@ -18,13 +20,15 @@ class AMarker {
     std::string get_name();
 
     // function gets called once when the marker is detected
-    virtual void on_appear(cv::Vec3d rotation, cv::Vec3d translation) = 0;
+    virtual void on_appear(cv::Vec3d rotation, cv::Vec3d translation,
+                           const Camera& camera, cv::Mat image) = 0;
 
     // function gets called repeadetly while the marker is visible
-    virtual void on_present(cv::Vec3d rotation, cv::Vec3d translation) = 0;
+    virtual void on_present(cv::Vec3d rotation, cv::Vec3d translation,
+                            const Camera& camera, cv::Mat image) = 0;
 
     // function gets called once when the marker is no longer detected
-    virtual void on_disappear() = 0;
+    virtual void on_disappear(cv::Mat image) = 0;
 
    protected:
     // Marker id
