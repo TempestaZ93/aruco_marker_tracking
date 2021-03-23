@@ -48,9 +48,9 @@ void ArucoTracker::add_marker(std::shared_ptr<AMarker> marker) {
 
 void ArucoTracker::remove_marker(std::string name) {
     // look if the marker is currently tracked
-    auto to_remove =
-        std::find_if(std::begin(this->m_markers), std::end(this->m_markers),
-                     [id](auto marker) { return marker->get_name() == name; });
+    auto to_remove = std::find_if(
+        std::begin(this->m_markers), std::end(this->m_markers),
+        [name](auto marker) { return marker->get_name() == name; });
 
     // if the marker is currently tracked, remove it
     if (to_remove != this->m_markers.end()) {
