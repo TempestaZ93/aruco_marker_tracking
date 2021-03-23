@@ -8,6 +8,7 @@
 
 #include "ArucoTracker.hpp"
 #include "CubeMarker.hpp"
+#include "PyramidMarker.hpp"
 #include "data/CSVBackend.hpp"
 
 int handle_arguments(int argc, char* argv[], std::string& calibration_file,
@@ -37,7 +38,9 @@ int main(int argc, char* argv[]) {
         std::make_shared<amt::CSVBackend>("testfile");
 
     std::vector<std::shared_ptr<amt::AMarker>> markers = {
-        std::make_shared<amt::CubeMarker>(757, "Cube Marker 1", 1)};
+        std::make_shared<amt::CubeMarker>(757, "Cube Marker", marker_size),
+        std::make_shared<amt::PyramidMarker>(971, "Pyramid Marker", marker_size,
+                                             1)};
 
     // create tracker
     amt::ArucoTracker tracker(markers, marker_size, calibration_file);
