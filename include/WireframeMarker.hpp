@@ -1,14 +1,12 @@
-#include "WireframeMarker.hpp"
+
+#include "AMarker.hpp"
 
 #pragma once
-
 namespace amt {
-
-class PyramidMarker : public WireframeMarker {
-    using base_type = WireframeMarker;
-
+class WireframeMarker : public AMarker {
    public:
-    PyramidMarker(int id, std::string name, float base_scaling, float height);
+    WireframeMarker(int id, std::string name, std::vector<cv::Point3d> points,
+                    std::vector<int> line_pairs);
 
     // function gets called once when the marker is detected
     virtual void on_appear(cv::Vec3d rotation, cv::Vec3d translation,
@@ -20,6 +18,9 @@ class PyramidMarker : public WireframeMarker {
 
     // function gets called once when the marker is no longer detected
     virtual void on_disappear(cv::Mat image) override;
-};
 
+   private:
+    std::vector<cv::Point3d> m_object_points;
+    std::vector<int> m_line_pairs;
+};
 }  // namespace amt
